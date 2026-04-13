@@ -1,9 +1,9 @@
 {
-  "name": "icm-exchange-repl",
-  "displayName": "Exchange REPL",
+  "name": "exchange-runner",
+  "displayName": "Exchange Runner",
   "description": "Run Ruby scripts in Autodesk InfoWorks Exchange (or Innovyze IExchange) and drop into an interactive REPL.",
   "version": "0.1.0",
-  "publisher": "your-publisher-id",
+  "publisher": "masalab-io",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -17,9 +17,9 @@
   "main": "./extension.js",
   "contributes": {
     "configuration": {
-      "title": "Exchange REPL",
+      "title": "Exchange Runner",
       "properties": {
-        "icmRepl.icmExchangePath": {
+        "exchangeRunner.icmExchangePath": {
           "type": "string",
           "default": "",
           "description": "Full path to ICMExchange.exe or IExchange.exe. If empty, the extension will prompt you to select one on first run."
@@ -28,41 +28,41 @@
     },
     "commands": [
       {
-        "command": "icmRepl.runRubyInIcm",
-        "title": "Exchange REPL: Run Ruby in Exchange",
+        "command": "exchangeRunner.runRubyInIcm",
+        "title": "Exchange Runner: Run Ruby in Exchange",
         "icon": "$(play)"
       },
       {
-        "command": "icmRepl.runRubyInIcmChooseExe",
-        "title": "Exchange REPL: Run Ruby in Exchange (choose executable...)",
+        "command": "exchangeRunner.runRubyInIcmChooseExe",
+        "title": "Exchange Runner: Run Ruby in Exchange (choose executable...)",
         "icon": "$(run-all)"
       },
       {
-        "command": "icmRepl.selectExecutable",
-        "title": "Exchange REPL: Select IExchange executable"
+        "command": "exchangeRunner.selectExecutable",
+        "title": "Exchange Runner: Select IExchange executable"
       }
     ],
     "menus": {
       "editor/title/run": [
         {
-          "command": "icmRepl.runRubyInIcm",
+          "command": "exchangeRunner.runRubyInIcm",
           "when": "resourceLangId == ruby",
           "group": "navigation"
         },
         {
-          "command": "icmRepl.runRubyInIcmChooseExe",
+          "command": "exchangeRunner.runRubyInIcmChooseExe",
           "when": "resourceLangId == ruby",
           "group": "navigation"
         }
       ],
       "editor/context": [
         {
-          "command": "icmRepl.runRubyInIcm",
+          "command": "exchangeRunner.runRubyInIcm",
           "when": "resourceLangId == ruby",
           "group": "1_run@1"
         },
         {
-          "command": "icmRepl.runRubyInIcmChooseExe",
+          "command": "exchangeRunner.runRubyInIcmChooseExe",
           "when": "resourceLangId == ruby",
           "group": "1_run@2"
         }
@@ -70,12 +70,12 @@
     },
     "keybindings": [
       {
-        "command": "icmRepl.runRubyInIcm",
+        "command": "exchangeRunner.runRubyInIcm",
         "key": "ctrl+alt+r",
         "when": "resourceLangId == ruby"
       },
       {
-        "command": "icmRepl.runRubyInIcmChooseExe",
+        "command": "exchangeRunner.runRubyInIcmChooseExe",
         "key": "ctrl+alt+shift+r",
         "when": "resourceLangId == ruby"
       }

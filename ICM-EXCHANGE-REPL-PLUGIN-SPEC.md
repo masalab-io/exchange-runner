@@ -1,6 +1,6 @@
-# ICM Exchange REPL — VS Code Extension Spec
+# Exchange Runner — VS Code Extension Spec
 
-Use this document to create and publish the **ICM Exchange REPL** VS Code (and Cursor) extension in a new project. When users install the extension, running a Ruby file (e.g. via Code Runner’s Run button) runs it in Autodesk InfoWorks ICM Exchange and then drops into an interactive REPL.
+Use this document to create and publish the **Exchange Runner** VS Code (and Cursor) extension in a new project. When users install the extension, running a Ruby file (e.g. via Code Runner’s Run button) runs it in Autodesk InfoWorks ICM Exchange and then drops into an interactive REPL.
 
 ---
 
@@ -16,17 +16,17 @@ Use this document to create and publish the **ICM Exchange REPL** VS Code (and C
 
 ## 2. Project layout
 
-Create a new folder (e.g. `icm-exchange-repl`) with this structure:
+Create a new folder (e.g. `exchange-runner`) with this structure:
 
 ```
-icm-exchange-repl/
+exchange-runner/
 ├── package.json          # Extension manifest
 ├── extension.js          # Activation + Code Runner config
 ├── README.md             # User-facing description + setup
 └── scripts/
     ├── run_ruby_repl.bat # Windows: receives .rb path, writes to file, runs ICMExchange with repl.rb
     ├── repl.rb           # Ruby: reads path, evals that file in ICM, then REPL loop (STDIN.gets)
-    └── (icm-path.txt     # Written by extension from setting icmRepl.icmExchangePath)
+    └── (icm-path.txt     # Written by extension from setting exchangeRunner.icmExchangePath)
 ```
 
 No build step: plain Node.js and bundled scripts.
@@ -39,11 +39,11 @@ No build step: plain Node.js and bundled scripts.
 
 ```json
 {
-  "name": "icm-exchange-repl",
-  "displayName": "ICM Exchange REPL",
+  "name": "exchange-runner",
+  "displayName": "Exchange Runner",
   "description": "Run Ruby scripts in Autodesk InfoWorks ICM Exchange and drop into an interactive REPL. Configures Code Runner to use ICMExchange.exe with a script-then-REPL flow.",
   "version": "0.1.0",
-  "publisher": "your-publisher-id",
+  "publisher": "masalab-io",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -56,9 +56,9 @@ No build step: plain Node.js and bundled scripts.
   "main": "./extension.js",
   "contributes": {
     "configuration": {
-      "title": "ICM Exchange REPL",
+      "title": "Exchange Runner",
       "properties": {
-        "icmRepl.icmExchangePath": {
+        "exchangeRunner.icmExchangePath": {
           "type": "string",
           "default": "",
           "description": "Full path to ICMExchange.exe (e.g. C:\\Program Files\\Autodesk\\InfoWorks ICM Ultimate 2026\\ICMExchange.exe). If empty, the bundled batch script uses its default path."
@@ -69,14 +69,14 @@ No build step: plain Node.js and bundled scripts.
 }
 ```
 
-Replace `your-publisher-id` with your Marketplace publisher ID when publishing.
+Replace `masalab-io` with your Marketplace publisher ID when publishing.
 
 ---
 
 ### 3.2 `extension.js`
 
 - Uses `context.extensionPath` to resolve `scripts/run_ruby_repl.bat`.
-- If the user has set `icmRepl.icmExchangePath`, writes it to `scripts/icm-path.txt` so the batch can use it.
+- If the user has set `exchangeRunner.icmExchangePath`, writes it to `scripts/icm-path.txt` so the batch can use it.
 - Merges into Code Runner’s `executorMap` so only the `ruby` key is set; other languages are left unchanged. Path is escaped for JSON (backslashes doubled) so the stored value is valid.
 
 ```javascript
@@ -93,7 +93,7 @@ async function activate(context) {
   const runnerPath = path.join(scriptsDir, isWindows ? 'run_ruby_repl.bat' : 'run_ruby_repl.sh');
 
   // Write ICM path to scripts/icm-path.txt if user set the setting
-  const icmPath = vscode.workspace.getConfiguration('icmRepl').get('icmExchangePath');
+  const icmPath = vscode.workspace.getConfiguration('exchangeRunner').get('icmExchangePath');
   if (icmPath && typeof icmPath === 'string' && icmPath.trim()) {
     const icmPathFile = path.join(scriptsDir, 'icm-path.txt');
     try {
@@ -111,7 +111,7 @@ async function activate(context) {
     await codeRunnerConfig.update('executorMap', executorMap, vscode.ConfigurationTarget.Global);
     await codeRunnerConfig.update('runInTerminal', true, vscode.ConfigurationTarget.Global);
   } catch (e) {
-    console.warn('ICM Exchange REPL: Could not update code-runner settings. Install Code Runner extension.', e);
+    console.warn('Exchange Runner: Could not update code-runner settings. Install Code Runner extension.', e);
   }
 }
 
@@ -222,7 +222,7 @@ start_repl(ruby_file_path)
 
 ## 4. Discovery and user selection of executable
 
-So users can pick the right executable without editing paths by hand, the extension can implement **installation discovery** (same idea as the Exter CLI) and a **command** that shows a list to choose from, then saves the selection to `icmRepl.icmExchangePath`.
+So users can pick the right executable without editing paths by hand, the extension can implement **installation discovery** (same idea as the Exter CLI) and a **command** that shows a list to choose from, then saves the selection to `exchangeRunner.icmExchangePath`.
 
 ### 4.1 Autodesk (ICMExchange.exe) discovery
 
@@ -319,10 +319,10 @@ function discoverInnovyze() {
 
 - Run **Autodesk** discovery and **Innovyze** discovery.
 - Build one list of choices, e.g. label + `exePath` (and optionally “Autodesk” vs “Innovyze” for display).
-- Register a command (e.g. **ICM REPL: Select executable**) that:
+- Register a command (e.g. **Exchange Runner: Select executable**) that:
   1. Calls `discoverAutodesk()` and `discoverInnovyze()`.
   2. Shows `vscode.window.showQuickPick(items)` with `items = list.map(x => ({ label: x.label, description: x.exePath }))`.
-  3. On pick, set `icmRepl.icmExchangePath` to the selected `exePath` (global config), then write the same path to `scripts/icm-path.txt` so the batch uses it.
+  3. On pick, set `exchangeRunner.icmExchangePath` to the selected `exePath` (global config), then write the same path to `scripts/icm-path.txt` so the batch uses it.
 
 Add to `package.json`:
 
@@ -330,8 +330,8 @@ Add to `package.json`:
 "contributes": {
   "commands": [
     {
-      "command": "icmRepl.selectExecutable",
-      "title": "ICM REPL: Select ICM / IExchange executable"
+      "command": "exchangeRunner.selectExecutable",
+      "title": "Exchange Runner: Select ICM / IExchange executable"
     }
   ]
 }
@@ -341,7 +341,7 @@ In `extension.js` in `activate()`:
 
 ```javascript
 context.subscriptions.push(
-  vscode.commands.registerCommand('icmRepl.selectExecutable', async () => {
+  vscode.commands.registerCommand('exchangeRunner.selectExecutable', async () => {
     const autodesk = discoverAutodesk();
     const innovyze = discoverInnovyze();
     const choices = [
@@ -353,15 +353,15 @@ context.subscriptions.push(
       return;
     }
     const picked = await vscode.window.showQuickPick(choices, {
-      placeHolder: 'Select executable for ICM REPL',
+      placeHolder: 'Select executable for Exchange Runner',
       matchOnDescription: true
     });
     if (picked) {
-      const config = vscode.workspace.getConfiguration('icmRepl');
+      const config = vscode.workspace.getConfiguration('exchangeRunner');
       await config.update('icmExchangePath', picked.exePath, vscode.ConfigurationTarget.Global);
       const scriptsDir = path.join(context.extensionPath, 'scripts');
       fs.writeFileSync(path.join(scriptsDir, 'icm-path.txt'), picked.exePath, 'utf8');
-      vscode.window.showInformationMessage(`ICM REPL will use: ${picked.exePath}`);
+      vscode.window.showInformationMessage(`Exchange Runner will use: ${picked.exePath}`);
     }
   })
 );
@@ -413,7 +413,7 @@ if /i "!EXE_BASENAME!"=="IExchange.exe" (
 ## 5. User flow after install
 
 1. Install the extension (and **Code Runner** if not already installed).
-2. (Optional) Run the command **ICM REPL: Select ICM / IExchange executable** to discover Autodesk and Innovyze installations and pick one; the selection is saved to settings and written to `scripts/icm-path.txt`. Or set **ICM Exchange REPL > Icm Exchange Path** manually.
+2. (Optional) Run the command **Exchange Runner: Select ICM / IExchange executable** to discover Autodesk and Innovyze installations and pick one; the selection is saved to settings and written to `scripts/icm-path.txt`. Or set **Exchange Runner > Icm Exchange Path** manually.
 3. Open any `.rb` file and run it with Code Runner (Run button or shortcut). The script runs in ICM Exchange (or IExchange with product ICM), then the `Exchange>>>` REPL appears; type expressions and `exit` to quit.
 
 ---
@@ -430,15 +430,15 @@ if /i "!EXE_BASENAME!"=="IExchange.exe" (
 
 1. Go to [Visual Studio Marketplace](https://marketplace.visualstudio.com/) → sign in.
 2. Click your profile → **Create Publisher**.
-3. Choose a **Publisher ID** (eatching as `your-publisher-id` in `package.json`).
+3. Choose a **Publisher ID** (eatching as `masalab-io` in `package.json`).
 
 ### 6.3 Package and publish
 
-From the extension root (e.g. `icm-exchange-repl/`):
+From the extension root (e.g. `exchange-runner/`):
 
 ```bash
 # Login once (then you can publish)
-vsce login <your-publisher-id>
+vsce login <masalab-io>
 
 # Package (creates .vsix)
 vsce package
@@ -472,8 +472,8 @@ Create a token at [open-vsx.org](https://open-vsx.org/) under your user → toke
 
 ## 8. Summary checklist for a new project
 
-1. Create folder and `package.json` (replace `your-publisher-id` when publishing). Include `contributes.commands` for **ICM REPL: Select executable** if you implement discovery.
-2. Add `extension.js` with `async function activate`, Code Runner config, and (optional) discovery + `icmRepl.selectExecutable` command.
+1. Create folder and `package.json` (replace `masalab-io` when publishing). Include `contributes.commands` for **Exchange Runner: Select executable** if you implement discovery.
+2. Add `extension.js` with `async function activate`, Code Runner config, and (optional) discovery + `exchangeRunner.selectExecutable` command.
 3. Implement **Autodesk discovery** (scan `C:\Program Files\Autodesk` for `InfoWorks ICM Ultimate*` → `ICMExchange.exe`) and **Innovyze discovery** (scan `C:\Program Files\Innovyze` and `Program Files (x86)\Innovyze` for `IExchange.exe`).
 4. Add `scripts/run_ruby_repl.bat` (read `icm-path.txt`; if exe is `IExchange.exe`, call with script + `ICM`, else script only).
 5. Add `scripts/repl.rb` (path from `current_file_path.txt`, then REPL with `STDIN.gets`).

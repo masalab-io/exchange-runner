@@ -1,4 +1,4 @@
-# Exchange REPL
+# Exchange Runner
 
 Run Ruby scripts inside **Autodesk InfoWorks ICM Exchange** (or legacy **Innovyze IExchange**) directly from VS Code / Cursor, then drop into an interactive REPL.
 
@@ -6,7 +6,7 @@ Run Ruby scripts inside **Autodesk InfoWorks ICM Exchange** (or legacy **Innovyz
 
 **Run a script and start the REPL:**
 
-![Exchange REPL](images/Exchange%20REPL.gif)
+![Exchange Runner](images/Exchange%20REPL.gif)
 
 **Evaluate expressions interactively:**
 
@@ -21,15 +21,15 @@ Run Ruby scripts inside **Autodesk InfoWorks ICM Exchange** (or legacy **Innovyz
 
 1. Install the extension.
 2. Open any `.rb` file.
-3. Run **Exchange REPL: Run Ruby in Exchange** from the Command Palette, the run button in the editor title bar, or the right-click context menu (`Ctrl+Alt+R`).
+3. Run **Exchange Runner: Run Ruby in Exchange** from the Command Palette, the run button in the editor title bar, or the right-click context menu (`Ctrl+Alt+R`).
 4. On first run, the extension will discover installed ICM versions and ask you to pick one. You can also browse manually for the executable.
 
 After the script executes, an interactive REPL panel opens. Type Ruby expressions to evaluate them in the ICM context, or type `exit` to quit.
 
 ## Changing the Executable
 
-- Run **Exchange REPL: Select IExchange executable** from the Command Palette at any time.
-- Or edit **Settings > Exchange REPL > ICM Exchange Path** (user or workspace).
+- Run **Exchange Runner: Select IExchange executable** from the Command Palette at any time.
+- Or edit **Settings > Exchange Runner > ICM Exchange Path** (user or workspace).
 
 ## Multiple Sessions and Different ICM Versions
 
@@ -49,12 +49,12 @@ You can run different scripts with different ICM versions at the same time (e.g.
 
 | Command | Description | Keybinding |
 |---------|-------------|------------|
-| **Exchange REPL: Run Ruby in Exchange** | Run the active `.rb` file and open the REPL panel | `Ctrl+Alt+R` |
-| **Exchange REPL: Run Ruby in Exchange (choose executable...)** | Same, but prompts to pick the executable first | `Ctrl+Alt+Shift+R` |
-| **Exchange REPL: Select IExchange executable** | Discover and change the active executable | |
+| **Exchange Runner: Run Ruby in Exchange** | Run the active `.rb` file and open the REPL panel | `Ctrl+Alt+R` |
+| **Exchange Runner: Run Ruby in Exchange (choose executable...)** | Same, but prompts to pick the executable first | `Ctrl+Alt+Shift+R` |
+| **Exchange Runner: Select IExchange executable** | Discover and change the active executable | |
 
 ## About Masa Lab
 
-Exchange REPL is built by [Masa Lab](https://masalab.io), tools for engineers working with hydraulic and stormwater models.
+Exchange Runner is built by [Masa Lab](https://masalab.io), tools for engineers working with hydraulic and stormwater models.
 
 Visit [masalab.io](https://masalab.io) to learn more.

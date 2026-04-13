@@ -2,14 +2,14 @@
 _Saved: 2026-03-14_
 
 ## Project
-VS Code/Cursor extension **ICM Exchange REPL** that runs Ruby scripts in Autodesk InfoWorks ICM Exchange (or Innovyze IExchange), drops into an interactive REPL, and (per an earlier plan) can show a Variables view. Primary goal: run the active .rb file via the extension and interact in the REPL.
+VS Code/Cursor extension **Exchange Runner** that runs Ruby scripts in Autodesk InfoWorks ICM Exchange (or Innovyze IExchange), drops into an interactive REPL, and (per an earlier plan) can show a Variables view. Primary goal: run the active .rb file via the extension and interact in the REPL.
 
 ## Current State
 - **Extension** invokes `run_ruby_repl.bat` with two args: Ruby file path (active editor) and ICM exe path; no temp file is created by the extension.
-- **Batch** (`scripts/run_ruby_repl.bat`) copies `repl.rb` to `%TEMP%\icm_repl\repl.rb` because ICMExchange.exe fails to load the script from the long extension path (e.g. `...\your-publisher-id.icm-exchange-repl-0.1.0\scripts\repl.rb`).
+- **Batch** (`scripts/run_ruby_repl.bat`) copies `repl.rb` to `%TEMP%\icm_repl\repl.rb` because ICMExchange.exe fails to load the script from the long extension path (e.g. `...\masalab-io.exchange-runner-0.1.0\scripts\repl.rb`).
 - **Path passing**: The exe does **not** forward command-line arguments to the Ruby script. So the batch writes the Ruby file path to a **per-run temp file** `%TEMP%\icm_ruby_%PID%.txt`, sets env `ICM_REPL_PID=%PID%`, and invokes the exe with only the path to `repl.rb`. This keeps parallel runs safe (each process has its own PID and file).
 - **repl.rb** reads the path via `read_ruby_path_from_pid_file` (uses `ENV['ICM_REPL_PID']` and `%TEMP%\icm_ruby_<pid>.txt`), then deletes the file; falls back to `ARGV[0]` for manual runs.
-- **Build**: `build-and-run-dev.bat` packages with `vsce package`, uninstalls then installs the extension via `cursor` CLI so it appears in Cursor’s extension list. Uses `icm-exchange-repl-0.1.0.vsix` (not publisher-prefixed name).
+- **Build**: `build-and-run-dev.bat` packages with `vsce package`, uninstalls then installs the extension via `cursor` CLI so it appears in Cursor’s extension list. Uses `exchange-runner-0.1.0.vsix` (not publisher-prefixed name).
 
 ## Active Task
 Confirming that the REPL runs successfully when launched from the extension. User had previously seen "File not found: ADSK" and "error reading file $...repl.rb$" from ICMExchange.exe; the copy-to-temp and PID-based path file were the latest fixes. No outstanding code change was in progress at handover.
@@ -20,11 +20,11 @@ Confirming that the REPL runs successfully when launched from the extension. Use
 3. If the PID-based path file fails (e.g. exe not inheriting env), consider verifying that the batch’s child process actually has `ICM_REPL_PID` set when the exe runs.
 
 ## Key Files
-- `icm-exchange-repl/extension.js` — Extension entry; discovers ICM exe, runs batch with file path + exe path via terminal.
-- `icm-exchange-repl/package.json` — Commands, config, views (if variable view was added).
-- `icm-exchange-repl/scripts/run_ruby_repl.bat` — Copies repl.rb to %TEMP%\icm_repl, writes path to %TEMP%\icm_ruby_%PID%.txt, sets ICM_REPL_PID, invokes ICMExchange.exe with path to repl.rb only.
-- `icm-exchange-repl/scripts/repl.rb` — Reads path from PID temp file or ARGV[0]; evals user script in binding, then REPL loop; supports `__list_vars__` for variable view.
-- `icm-exchange-repl/build-and-run-dev.bat` — Package, uninstall, install via `cursor` for testing in Cursor.
+- `exchange-runner/extension.js` — Extension entry; discovers ICM exe, runs batch with file path + exe path via terminal.
+- `exchange-runner/package.json` — Commands, config, views (if variable view was added).
+- `exchange-runner/scripts/run_ruby_repl.bat` — Copies repl.rb to %TEMP%\icm_repl, writes path to %TEMP%\icm_ruby_%PID%.txt, sets ICM_REPL_PID, invokes ICMExchange.exe with path to repl.rb only.
+- `exchange-runner/scripts/repl.rb` — Reads path from PID temp file or ARGV[0]; evals user script in binding, then REPL loop; supports `__list_vars__` for variable view.
+- `exchange-runner/build-and-run-dev.bat` — Package, uninstall, install via `cursor` for testing in Cursor.
 
 ## Decisions & Context
 - **No shared env for path**: A single env var like `ICM_RUBY_FILE` was rejected so that parallel runs (multiple scripts/terminals) don’t overwrite each other; hence per-PID temp file.

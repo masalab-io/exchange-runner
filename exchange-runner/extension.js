@@ -77,7 +77,7 @@ function writeIcmPathFile(scriptsDir, exePath) {
 }
 
 function readIcmPathSetting() {
-  const val = vscode.workspace.getConfiguration('icmRepl').get('icmExchangePath');
+  const val = vscode.workspace.getConfiguration('exchangeRunner').get('icmExchangePath');
   return (typeof val === 'string' && val.trim()) ? val.trim() : '';
 }
 
@@ -90,17 +90,17 @@ function parseExeShortName(exePath) {
 
 function updateStatusBar(item, exePath) {
   if (exePath) {
-    item.text = `$(gear) ICM Exchange: ${parseExeShortName(exePath)}`;
+    item.text = `$(gear) Exchange Runner: ${parseExeShortName(exePath)}`;
     item.backgroundColor = undefined;
   } else {
-    item.text = '$(gear) ICM Exchange: Not Set';
+    item.text = '$(gear) Exchange Runner: Not Set';
     item.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
   }
   item.show();
 }
 
 async function saveIcmPath(context, exePath, statusBarItem) {
-  const config = vscode.workspace.getConfiguration('icmRepl');
+  const config = vscode.workspace.getConfiguration('exchangeRunner');
   await config.update('icmExchangePath', exePath, vscode.ConfigurationTarget.Global);
   writeIcmPathFile(getScriptsDir(context), exePath);
   if (statusBarItem) updateStatusBar(statusBarItem, exePath);
@@ -132,7 +132,7 @@ async function promptSelectExecutable(context, statusBarItem) {
     );
   }
   const picked = await vscode.window.showQuickPick(choices, {
-    placeHolder: 'Select the ICM Exchange executable to use',
+    placeHolder: 'Select the Exchange Runner executable to use',
     matchOnDescription: true
   });
   if (!picked) return '';
@@ -142,13 +142,13 @@ async function promptSelectExecutable(context, statusBarItem) {
       canSelectMany: false,
       filters: { 'Executable': ['exe'] },
       openLabel: 'Select ICMExchange.exe or IExchange.exe',
-      title: 'Select ICM Exchange Executable'
+      title: 'Select Exchange Runner Executable'
     });
     if (!uris || uris.length === 0) return '';
     exePath = uris[0].fsPath;
   }
   await saveIcmPath(context, exePath, statusBarItem);
-  vscode.window.showInformationMessage(`ICM REPL will use: ${exePath}`);
+  vscode.window.showInformationMessage(`Exchange Runner will use: ${exePath}`);
   return exePath;
 }
 
@@ -164,7 +164,7 @@ async function ensureExePath(context, statusBarItem) {
 let _logChannel = null;
 function logChannel() {
   if (!_logChannel) {
-    _logChannel = vscode.window.createOutputChannel('ICM REPL Debug');
+    _logChannel = vscode.window.createOutputChannel('Exchange Runner Debug');
   }
   return _logChannel;
 }
@@ -632,7 +632,7 @@ class ReplEditorSession {
   }
 
   _setSessionRunning(on) {
-    vscode.commands.executeCommand('setContext', 'icmRepl.sessionRunning', on);
+    vscode.commands.executeCommand('setContext', 'exchangeRunner.sessionRunning', on);
   }
 
   _handleExit(code) {
@@ -1703,7 +1703,7 @@ function buildHtml() {
       brand.className = 'banner-brand';
       [
         { cls: 'brand-fish', text: '><(\u00ba>'        },
-        { cls: 'brand-name', text: 'Exchange REPL'     },
+        { cls: 'brand-name', text: 'Exchange Runner'    },
         { cls: 'brand-dot',  text: '\u00b7'            },
         { cls: 'brand-by',   text: 'by Masa Lab'       }
       ].forEach(function(p) {
@@ -2015,13 +2015,13 @@ function buildHtml() {
 
 function activate(context) {
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-  statusBarItem.command = 'icmRepl.selectExecutable';
-  statusBarItem.tooltip = 'Click to select ICM Exchange executable';
+  statusBarItem.command = 'exchangeRunner.selectExecutable';
+  statusBarItem.tooltip = 'Click to select Exchange Runner executable';
   context.subscriptions.push(statusBarItem);
   updateStatusBar(statusBarItem, readIcmPathSetting());
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration(e => {
-      if (e.affectsConfiguration('icmRepl.icmExchangePath')) {
+      if (e.affectsConfiguration('exchangeRunner.icmExchangePath')) {
         updateStatusBar(statusBarItem, readIcmPathSetting());
       }
     })
@@ -2032,24 +2032,24 @@ function activate(context) {
   if (icmPath) writeIcmPathFile(scriptsDir, icmPath);
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('icmRepl.runRubyInIcm', async () => {
+    vscode.commands.registerCommand('exchangeRunner.runRubyInIcm', async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
-        vscode.window.showWarningMessage('Exchange REPL: No active editor. Open a .rb file first.');
+        vscode.window.showWarningMessage('Exchange Runner: No active editor. Open a .rb file first.');
         return;
       }
       const filePath = editor.document.uri.fsPath;
       if (!filePath.toLowerCase().endsWith('.rb')) {
-        vscode.window.showWarningMessage('Exchange REPL: The active file is not a Ruby (.rb) file.');
+        vscode.window.showWarningMessage('Exchange Runner: The active file is not a Ruby (.rb) file.');
         return;
       }
       await editor.document.save();
       const exePath = await ensureExePath(context, statusBarItem);
       if (!exePath) return;
 
-      const title = 'Exchange REPL: ' + path.basename(filePath);
+      const title = 'Exchange Runner: ' + path.basename(filePath);
       const panel = vscode.window.createWebviewPanel(
-        'icmRepl.repl',
+        'exchangeRunner.repl',
         title,
         vscode.ViewColumn.Beside,
         { enableScripts: true, retainContextWhenHidden: true }
@@ -2060,24 +2060,24 @@ function activate(context) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('icmRepl.runRubyInIcmChooseExe', async () => {
+    vscode.commands.registerCommand('exchangeRunner.runRubyInIcmChooseExe', async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
-        vscode.window.showWarningMessage('Exchange REPL: No active editor. Open a .rb file first.');
+        vscode.window.showWarningMessage('Exchange Runner: No active editor. Open a .rb file first.');
         return;
       }
       const filePath = editor.document.uri.fsPath;
       if (!filePath.toLowerCase().endsWith('.rb')) {
-        vscode.window.showWarningMessage('Exchange REPL: The active file is not a Ruby (.rb) file.');
+        vscode.window.showWarningMessage('Exchange Runner: The active file is not a Ruby (.rb) file.');
         return;
       }
       await editor.document.save();
       const exePath = await promptSelectExecutable(context, statusBarItem);
       if (!exePath) return;
 
-      const title = 'Exchange REPL: ' + path.basename(filePath);
+      const title = 'Exchange Runner: ' + path.basename(filePath);
       const panel = vscode.window.createWebviewPanel(
-        'icmRepl.repl',
+        'exchangeRunner.repl',
         title,
         vscode.ViewColumn.Beside,
         { enableScripts: true, retainContextWhenHidden: true }
@@ -2088,7 +2088,7 @@ function activate(context) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('icmRepl.selectExecutable',
+    vscode.commands.registerCommand('exchangeRunner.selectExecutable',
       () => promptSelectExecutable(context, statusBarItem))
   );
 

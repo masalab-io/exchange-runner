@@ -6,8 +6,8 @@ cd /d "%~dp0"
 REM Read publisher and version from package.json via PowerShell
 for /f "delims=" %%A in ('powershell -NoProfile -Command "(Get-Content package.json -Raw | ConvertFrom-Json).publisher"') do set "PUBLISHER=%%A"
 for /f "delims=" %%A in ('powershell -NoProfile -Command "(Get-Content package.json -Raw | ConvertFrom-Json).version"') do set "VERSION=%%A"
-set "EXT_ID=!PUBLISHER!.icm-exchange-repl"
-set "VSIX=icm-exchange-repl-!VERSION!.vsix"
+set "EXT_ID=!PUBLISHER!.exchange-runner"
+set "VSIX=exchange-runner-!VERSION!.vsix"
 
 echo Publisher : !PUBLISHER!
 echo Version   : !VERSION!

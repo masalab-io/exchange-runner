@@ -1,4 +1,4 @@
-# CLAUDE.md — ICM Exchange REPL
+# CLAUDE.md — Exchange Runner
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. It also serves as a cross-project reference for related projects (e.g., landing page, auth/login, dashboard) that will integrate with this extension as a freemium product.
 
@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Name:** ICM Exchange REPL (`icm-exchange-repl`)
+**Name:** Exchange Runner (`exchange-runner`)
 **Type:** VS Code / Cursor extension (`.vsix`)
 **Version:** 0.1.0 (not yet published — publisher ID is placeholder)
 **Tech stack:** Plain Node.js, VS Code Extension API, embedded HTML/CSS/JS webview, Ruby, Windows batch
@@ -72,7 +72,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### What's Not Done Yet
 
-- **Publisher ID** — Still placeholder (`your-publisher-id`) in `package.json`
+- **Publisher ID** — Set to `masalab-io` in `package.json`
 - **Marketplace publishing** — Not yet published to VS Code Marketplace or Open VSX
 - **Freemium gating** — No license checking, feature flags, or tier enforcement
 - **Auth integration** — No connection to any auth/login system
@@ -88,7 +88,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```
 User triggers Ctrl+Alt+R (or run button / context menu)
   → extension.js: ensureExePath()
-      → reads icmRepl.icmExchangePath setting
+      → reads exchangeRunner.icmExchangePath setting
       → if empty: promptSelectExecutable() → discoverAll() → QuickPick → save
   → ReplEditorSession created (new WebviewPanel tab)
   → ReplProcess.start(scriptsDir, rubyFilePath, exePath):
@@ -127,7 +127,7 @@ User triggers Ctrl+Alt+R (or run button / context menu)
 | `discoverAutodesk()` | `C:\Program Files\Autodesk\InfoWorks ICM Ultimate*\` | `ICMExchange.exe` |
 | `discoverInnovyze()` | `C:\Program Files\Innovyze\` and `C:\Program Files (x86)\Innovyze\` (up to 3 levels deep) | `IExchange.exe` |
 
-Results combined via `discoverAll()`, presented in QuickPick with a "Browse..." option. Selection saved to `icmRepl.icmExchangePath` (global VS Code setting) and `scripts/icm-path.txt` (for batch script fallback).
+Results combined via `discoverAll()`, presented in QuickPick with a "Browse..." option. Selection saved to `exchangeRunner.icmExchangePath` (global VS Code setting) and `scripts/icm-path.txt` (for batch script fallback).
 
 ### Webview Communication
 
@@ -149,25 +149,25 @@ Webview → Extension (`postMessage`):
 
 | File | Purpose |
 |------|---------|
-| `icm-exchange-repl/extension.js` | **Everything**: discovery, process management, webview HTML/CSS/JS (~800+ lines) |
-| `icm-exchange-repl/package.json` | Extension manifest: commands, config, keybindings, menus, activation |
-| `icm-exchange-repl/scripts/repl.rb` | Ruby REPL engine running inside ICMExchange.exe (~416 lines) |
-| `icm-exchange-repl/scripts/run_ruby_repl.bat` | Standalone launcher (batch): temp-dir copy, exe detection, invocation |
+| `exchange-runner/extension.js` | **Everything**: discovery, process management, webview HTML/CSS/JS (~800+ lines) |
+| `exchange-runner/package.json` | Extension manifest: commands, config, keybindings, menus, activation |
+| `exchange-runner/scripts/repl.rb` | Ruby REPL engine running inside ICMExchange.exe (~416 lines) |
+| `exchange-runner/scripts/run_ruby_repl.bat` | Standalone launcher (batch): temp-dir copy, exe detection, invocation |
 | `ICM-EXCHANGE-REPL-PLUGIN-SPEC.md` | Original self-contained spec (authoritative design reference) |
 
 ---
 
 ## Build & Development Commands
 
-All commands run from `icm-exchange-repl/`:
+All commands run from `exchange-runner/`:
 
 ```bash
 # Package the extension as a .vsix
 vsce package
 
 # Install into Cursor IDE (dev workflow)
-cursor --uninstall-extension icm-exchange-repl
-cursor --install-extension .\icm-exchange-repl-0.1.0.vsix
+cursor --uninstall-extension exchange-runner
+cursor --install-extension .\exchange-runner-0.1.0.vsix
 ```
 
 `build-and-run-dev.bat` chains these for convenience.
@@ -199,7 +199,7 @@ These are the areas where a landing page, auth, and dashboard project would need
 - **Potential paid features:** unlimited sessions, deep variable inspection, export functionality, multi-model support
 
 ### 4. Extension Settings That a Web Dashboard Could Manage
-- `icmRepl.icmExchangePath` — currently the only user-facing setting
+- `exchangeRunner.icmExchangePath` — currently the only user-facing setting
 - Future: license key, telemetry opt-in, tier-specific feature toggles
 
 ### 5. User Flow for Freemium
