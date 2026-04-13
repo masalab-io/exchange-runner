@@ -1,0 +1,84 @@
+{
+  "name": "icm-exchange-repl",
+  "displayName": "Exchange REPL",
+  "description": "Run Ruby scripts in Autodesk InfoWorks Exchange (or Innovyze IExchange) and drop into an interactive REPL.",
+  "version": "0.1.0",
+  "publisher": "your-publisher-id",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "icon": "media/icon.png",
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Exchange REPL",
+      "properties": {
+        "icmRepl.icmExchangePath": {
+          "type": "string",
+          "default": "",
+          "description": "Full path to ICMExchange.exe or IExchange.exe. If empty, the extension will prompt you to select one on first run."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "icmRepl.runRubyInIcm",
+        "title": "Exchange REPL: Run Ruby in Exchange",
+        "icon": "$(play)"
+      },
+      {
+        "command": "icmRepl.runRubyInIcmChooseExe",
+        "title": "Exchange REPL: Run Ruby in Exchange (choose executable...)",
+        "icon": "$(run-all)"
+      },
+      {
+        "command": "icmRepl.selectExecutable",
+        "title": "Exchange REPL: Select IExchange executable"
+      }
+    ],
+    "menus": {
+      "editor/title/run": [
+        {
+          "command": "icmRepl.runRubyInIcm",
+          "when": "resourceLangId == ruby",
+          "group": "navigation"
+        },
+        {
+          "command": "icmRepl.runRubyInIcmChooseExe",
+          "when": "resourceLangId == ruby",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "icmRepl.runRubyInIcm",
+          "when": "resourceLangId == ruby",
+          "group": "1_run@1"
+        },
+        {
+          "command": "icmRepl.runRubyInIcmChooseExe",
+          "when": "resourceLangId == ruby",
+          "group": "1_run@2"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "icmRepl.runRubyInIcm",
+        "key": "ctrl+alt+r",
+        "when": "resourceLangId == ruby"
+      },
+      {
+        "command": "icmRepl.runRubyInIcmChooseExe",
+        "key": "ctrl+alt+shift+r",
+        "when": "resourceLangId == ruby"
+      }
+    ]
+  }
+}
