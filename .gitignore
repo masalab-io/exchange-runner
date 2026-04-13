@@ -1,4 +1,5 @@
 .cursor/
-.claude/skills/
-icm-exchange-repl/scripts/icm-path.txt
+.claude/
 Videos/
+test/
+icm-exchange-repl/scripts/icm-path.txt
